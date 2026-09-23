@@ -1,0 +1,52 @@
+kind: system
+system:
+  key: book-manager-01
+  name: Library Book Manager
+  tags:
+    - internet-facing
+  purpose: >-
+    Hold the library's catalogue of titles and copies, decide who may change it, and track every
+    copy that leaves the building and comes back.
+  owningTeam: payments
+inherits:
+  - code: SEC
+    standard: org-sec-004
+    baselineVersion: 7
+components:
+  - key: web
+    tags:
+      - web-ui
+    inherits:
+      - code: UI
+        standard: plt-ui-001
+        baselineVersion: 4
+      - code: UIR
+        standard: plt-ui-react-001
+        baselineVersion: 1
+    repository: ebrand/library-book-manager/web
+  - key: api
+    tags:
+      - service
+      - external-api
+    inherits:
+      - code: API
+        standard: plt-api-001
+        baselineVersion: 3
+      - code: SVC
+        standard: plt-svc-001
+        baselineVersion: 3
+    repository: ebrand/library-book-manager/api
+capabilities:
+  - code: BOOK
+    file: capabilities/book.yaml
+    name: Book records
+    specStatus: specified
+  - code: AUTH
+    file: capabilities/auth.yaml
+    name: Authentication and authorization
+    specStatus: specified
+  - code: LEND
+    file: capabilities/lend.yaml
+    name: Lending
+    specStatus: partial
+schemaVersion: 0.1.0

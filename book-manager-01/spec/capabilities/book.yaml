@@ -1,0 +1,116 @@
+kind: capability
+system: book-manager-01
+capability:
+  code: BOOK
+  name: Book records
+  summary: The catalogue of titles the library holds, the physical copies of each, and who may change them.
+  specStatus: specified
+requirements:
+  - id: REQ-BOOK-001
+    risk: medium
+    status: active
+    statement: >-
+      A librarian shall be able to add a title to the catalogue by supplying its ISBN, title, author
+      and publication year, and the system shall reject a title whose ISBN already exists in the
+      catalogue.
+    acceptanceCriteria:
+      - id: AC-BOOK-001-1
+        then: the title is in the catalogue with zero copies and is returned by a search for that ISBN
+        when: a librarian adds that ISBN with a title, author and year
+        given: a catalogue with no title for ISBN 9780261102217
+      - id: AC-BOOK-001-2
+        then: the request is rejected with error ISBN_ALREADY_EXISTS and the catalogue is unchanged
+        when: a librarian adds that ISBN again
+        given: a catalogue already holding ISBN 9780261102217
+      - id: AC-BOOK-001-3
+        then: the request is rejected with error FIELD_REQUIRED naming publicationYear
+        when: a librarian adds it with the publication year left empty
+        given: a catalogue with no title for a given ISBN
+  - id: REQ-BOOK-002
+    risk: medium
+    status: active
+    statement: >-
+      A librarian shall be able to add a physical copy to an existing title, and the system shall
+      assign that copy a barcode unique across the library.
+    acceptanceCriteria:
+      - id: AC-BOOK-002-1
+        then: the title reports three copies and the new copy has a barcode held by no other copy
+        when: a librarian adds a third copy
+        given: a title with two copies
+      - id: AC-BOOK-002-2
+        then: the request is rejected with error BARCODE_IN_USE
+        when: a librarian adds a copy with that barcode
+        given: a copy barcode already in use
+  - id: REQ-BOOK-003
+    risk: low
+    status: active
+    statement: >-
+      A librarian shall be able to change a title's title, author and publication year, and the
+      system shall preserve its ISBN, its copies and their loan history.
+    acceptanceCriteria:
+      - id: AC-BOOK-003-1
+        then: >-
+          the author is updated and the title still reports three copies with the same loan still
+          open
+        when: a librarian corrects the author's spelling
+        given: a title with three copies, one on loan
+      - id: AC-BOOK-003-2
+        then: the request is rejected with error ISBN_IMMUTABLE
+        when: a librarian attempts to change its ISBN
+        given: an existing title
+  - id: REQ-BOOK-004
+    risk: high
+    status: active
+    statement: >-
+      A librarian shall be able to remove a copy from the catalogue, and the system shall refuse to
+      remove a copy that is currently on loan.
+    acceptanceCriteria:
+      - id: AC-BOOK-004-1
+        then: the copy is gone from the catalogue and the title reports one fewer copy
+        when: a librarian removes it
+        given: a copy that is on the shelf
+      - id: AC-BOOK-004-2
+        then: the request is rejected with error COPY_ON_LOAN and the loan is unchanged
+        when: a librarian removes it
+        given: a copy that is on loan to a member
+      - id: AC-BOOK-004-3
+        then: >-
+          the title remains in the catalogue with zero copies and is marked unavailable in search
+          results
+        when: a librarian removes that copy
+        given: a title whose last remaining copy is removed
+  - id: REQ-BOOK-005
+    risk: low
+    status: active
+    statement: >-
+      Any authenticated user shall be able to search the catalogue by title, author or ISBN, and the
+      system shall return results in pages of at most 50 with the total number of matches.
+    acceptanceCriteria:
+      - id: AC-BOOK-005-1
+        then: the first 50 matches are returned along with a total of 120
+        when: a member searches for author "Le Guin" without naming a page
+        given: a catalogue of 120 titles whose author is "Le Guin"
+      - id: AC-BOOK-005-2
+        then: matches 101 to 120 are returned along with a total of 120
+        when: the member asks for the third page
+        given: the same search
+      - id: AC-BOOK-005-3
+        then: an empty result is returned with a total of 0 and not an error
+        when: a member searches for it
+        given: a catalogue with no match for the search term
+  - id: REQ-BOOK-006
+    risk: low
+    status: active
+    statement: >-
+      The system shall report, for each title in a search result, how many of its copies are on the
+      shelf.
+    acceptanceCriteria:
+      - id: AC-BOOK-006-1
+        then: the result reports one copy available of three
+        when: a member searches and the title matches
+        given: a title with three copies, two of them on loan
+      - id: AC-BOOK-006-2
+        then: the result reports zero copies available and the title is still listed
+        when: a member searches and the title matches
+        given: a title whose every copy is on loan
+schemaVersion: 0.1.0

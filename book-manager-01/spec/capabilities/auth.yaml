@@ -1,0 +1,118 @@
+kind: capability
+system: book-manager-01
+capability:
+  code: AUTH
+  name: Authentication and authorization
+  summary: Proving who a user is, and deciding what that user may do.
+  specStatus: specified
+requirements:
+  - id: REQ-AUTH-001
+    risk: high
+    status: active
+    statement: >-
+      The system shall authenticate a user by email address and password, and shall issue a session
+      that identifies that user on subsequent requests.
+    acceptanceCriteria:
+      - id: AC-AUTH-001-1
+        then: a session is issued and requests carrying it are attributed to that member
+        when: they sign in with that email and password
+        given: a registered member with a known password
+      - id: AC-AUTH-001-2
+        then: the request is rejected with error INVALID_CREDENTIALS and no session is issued
+        when: they sign in with the wrong password
+        given: a registered member
+      - id: AC-AUTH-001-3
+        then: >-
+          the request is rejected with error INVALID_CREDENTIALS, worded identically to a wrong
+          password
+        when: someone signs in with it
+        given: an email address with no account
+  - id: REQ-AUTH-002
+    risk: high
+    status: active
+    statement: >-
+      The system shall store passwords only as a salted hash, and shall never return a password or
+      its hash in any response.
+    acceptanceCriteria:
+      - id: AC-AUTH-002-1
+        then: it holds a salted hash and not the password
+        when: the stored record is inspected
+        given: a member who has just set a password
+      - id: AC-AUTH-002-2
+        then: the response carries no password and no hash field
+        when: it is called by any role
+        given: any endpoint that returns a user record
+  - id: REQ-AUTH-003
+    risk: high
+    status: active
+    statement: >-
+      The system shall lock an account for 15 minutes after five consecutive failed sign-in
+      attempts, and shall reject sign-in for that account while it is locked even when the password
+      is correct.
+    acceptanceCriteria:
+      - id: AC-AUTH-003-1
+        then: the account is locked and the response carries error ACCOUNT_LOCKED
+        when: a fifth attempt fails
+        given: an account with four consecutive failed attempts
+      - id: AC-AUTH-003-2
+        then: the request is rejected with error ACCOUNT_LOCKED
+        when: the correct password is supplied within the 15 minutes
+        given: a locked account
+      - id: AC-AUTH-003-3
+        then: the session is issued and the failed count returns to zero
+        when: a fifth attempt succeeds
+        given: an account with four consecutive failed attempts
+  - id: REQ-AUTH-004
+    risk: high
+    status: active
+    statement: >-
+      The system shall assign every user exactly one of the roles member, librarian or
+      administrator, and shall refuse any request whose role does not permit the operation.
+    acceptanceCriteria:
+      - id: AC-AUTH-004-1
+        then: the request is rejected with error FORBIDDEN and the catalogue is unchanged
+        when: they attempt to add a title to the catalogue
+        given: a user with the role member
+      - id: AC-AUTH-004-2
+        then: the title is added
+        when: they add a title to the catalogue
+        given: a user with the role librarian
+      - id: AC-AUTH-004-3
+        then: the request is rejected with error FORBIDDEN
+        when: they attempt to change another user's role
+        given: a user with the role librarian
+      - id: AC-AUTH-004-4
+        then: the role is changed
+        when: they change another user's role
+        given: a user with the role administrator
+  - id: REQ-AUTH-005
+    risk: medium
+    status: active
+    statement: >-
+      The system shall end a session when the user signs out, and shall expire a session that has
+      been idle for 30 days.
+    acceptanceCriteria:
+      - id: AC-AUTH-005-1
+        then: the request is rejected with error SESSION_INVALID
+        when: they sign out and then reuse the session
+        given: a signed-in member
+      - id: AC-AUTH-005-2
+        then: the request is rejected with error SESSION_EXPIRED
+        when: it is presented
+        given: a session unused for 30 days
+  - id: REQ-AUTH-006
+    risk: medium
+    status: active
+    statement: >-
+      The system shall record every sign-in, sign-out and role change with the acting user, the
+      affected user and the time, and shall retain those records for two years.
+    acceptanceCriteria:
+      - id: AC-AUTH-006-1
+        then: a record names the administrator, the member, the old role, the new role and the time
+        when: the change is made
+        given: an administrator changing a member to librarian
+      - id: AC-AUTH-006-2
+        then: the record is still present
+        when: retention runs
+        given: an audit record written two years ago less a day
+schemaVersion: 0.1.0
