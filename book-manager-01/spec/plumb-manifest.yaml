@@ -1,0 +1,45 @@
+schemaVersion: 0.1.0
+kind: manifest
+system: book-manager-01
+baselineVersion: 3
+changeProposal: CP-3
+generatedAt: "2026-09-23T21:02:18.044Z"
+contentHash: sha256:60be074e3269a1b68a32cfbe40d4097d63d8ac80425238fee4ca65d99c285a94
+files:
+  capabilities/auth.yaml: sha256:73753e6ecde5f0672f3330706459089cfefde3e5506920040620f2b90c431d18
+  capabilities/book.yaml: sha256:f1ecb5fe5199934e57d7f91fc4d303ebac277052081ce74c8f12e965052a23f3
+  capabilities/lend.yaml: sha256:4cdc3145fc02d989364bd1ac3f0b792d35fca7b7caa921264fcc052e2ef23b71
+  system.yaml: sha256:470c67bd86d887a8609ac55d13b914552f2c831987cef9dd24495561fddd132d
+inherited:
+  - standard: org-sec-004
+    baselineVersion: 7
+    contentHash: sha256:8e62f4261f2d1cd2f1806defc0181ab6279c49ec14006ed6b07ec70e7015b8b7
+  - standard: plt-ui-001
+    component: web
+    baselineVersion: 4
+    contentHash: sha256:5db7dd7f6d1c94a9e6a344d5a0862a7d301159cb9315a66623cbd7b4c7d6fb9a
+  - standard: plt-ui-react-001
+    component: web
+    baselineVersion: 1
+    contentHash: sha256:76538fbc13576cdcbed74a568a8f185e93e16214a06539a5b99d4dbd013067a7
+  - standard: plt-api-001
+    component: api
+    baselineVersion: 3
+    contentHash: sha256:53c5ff536df9a3e8bb27c101dc09eca60a2df963241e00e433fb3a185a25ab93
+  - standard: plt-svc-001
+    component: api
+    baselineVersion: 3
+    contentHash: sha256:594f429acbb259446a5cf15332442b9abfa9a24637705c338f31d1415f6be9d2
+registries:
+  - registry: example-tags
+    governingHash: sha256:6fb93de0a552b908880e1a57277e1be374cc7405ee22c60442e88265f47d6b43
+  - registry: example-parties
+    governingHash: sha256:1ac15a4aeab3089f03d08cdc4f3934c3cb41da93cf27fd44026784ddb43e2aeb
+approvals:
+  - person: mokafor
+    role: security
+    approvedAt: "2026-09-23T20:59:43.009Z"
+    contentHash: sha256:60be074e3269a1b68a32cfbe40d4097d63d8ac80425238fee4ca65d99c285a94
+generator:
+  name: plumb
+  version: 0.1.0

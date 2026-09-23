@@ -1,0 +1,128 @@
+kind: capability
+system: book-manager-01
+capability:
+  code: LEND
+  name: Lending
+  summary: Taking a copy off the shelf into a member's hands, and getting it back.
+  specStatus: partial
+  unspecified:
+    - area: Holds and reservations
+      reason: >-
+        Queueing for a title that is fully out is wanted, but the branch-transfer rules it depends
+        on are not settled. Tracked for a later proposal.
+    - area: Overdue fines and payment
+      reason: >-
+        The library has not decided whether it charges fines at all; nothing here should assume it
+        does.
+requirements:
+  - id: REQ-LEND-001
+    risk: high
+    status: active
+    statement: >-
+      A librarian shall be able to check out an available copy to a member, and the system shall set
+      the loan due 21 days from the day it is checked out.
+    acceptanceCriteria:
+      - id: AC-LEND-001-1
+        then: the copy is on loan to that member and the loan is due on 22 March
+        when: a librarian checks the copy out to them on 1 March
+        given: an available copy and a member in good standing
+      - id: AC-LEND-001-2
+        then: the request is rejected with error COPY_ON_LOAN and the existing loan is unchanged
+        when: a librarian checks it out
+        given: a copy already on loan to another member
+      - id: AC-LEND-001-3
+        then: the request is rejected with error COPY_NOT_FOUND
+        when: a librarian checks it out
+        given: a copy that has been removed from the catalogue
+  - id: REQ-LEND-002
+    risk: medium
+    status: active
+    statement: The system shall refuse to check out a copy to a member who already has ten copies on loan.
+    acceptanceCriteria:
+      - id: AC-LEND-002-1
+        then: the loan is created
+        when: a librarian checks out a tenth
+        given: a member holding nine copies
+      - id: AC-LEND-002-2
+        then: the request is rejected with error LOAN_LIMIT_REACHED
+        when: a librarian checks out an eleventh
+        given: a member holding ten copies
+  - id: REQ-LEND-003
+    risk: medium
+    status: active
+    statement: The system shall refuse to check out a copy to a member who has a loan that is overdue.
+    acceptanceCriteria:
+      - id: AC-LEND-003-1
+        then: the request is rejected with error MEMBER_HAS_OVERDUE_LOAN
+        when: a librarian checks out another copy to them
+        given: a member with one overdue loan
+      - id: AC-LEND-003-2
+        then: the loan is created
+        when: a librarian checks out a copy to them
+        given: a member whose only overdue loan has just been returned
+  - id: REQ-LEND-004
+    risk: high
+    status: active
+    statement: >-
+      A librarian shall be able to return a copy that is on loan, and the system shall close the
+      loan and put the copy back on the shelf on the day it is returned.
+    acceptanceCriteria:
+      - id: AC-LEND-004-1
+        then: the loan is closed with a return date of 10 March and the copy is available
+        when: a librarian returns it on 10 March
+        given: a copy on loan to a member
+      - id: AC-LEND-004-2
+        then: the request is rejected with error COPY_NOT_ON_LOAN
+        when: a librarian returns it
+        given: a copy that is already on the shelf
+      - id: AC-LEND-004-3
+        then: the loan is closed and recorded as returned late
+        when: a librarian returns it
+        given: a copy returned after its due date
+  - id: REQ-LEND-005
+    risk: medium
+    status: active
+    statement: >-
+      The system shall mark a loan overdue on the day after its due date, and shall keep it overdue
+      until the copy is returned.
+    acceptanceCriteria:
+      - id: AC-LEND-005-1
+        then: the loan is overdue
+        when: the day becomes 23 March
+        given: a loan due on 22 March that has not been returned
+      - id: AC-LEND-005-2
+        then: the loan is not overdue
+        when: the day becomes 23 March
+        given: a loan due on 22 March returned on 22 March
+  - id: REQ-LEND-006
+    risk: medium
+    status: active
+    statement: >-
+      A member shall be able to see their own current loans with the due date of each, and shall not
+      be able to see another member's loans.
+    acceptanceCriteria:
+      - id: AC-LEND-006-1
+        then: both loans are returned with their due dates
+        when: they ask for their loans
+        given: a member holding two copies
+      - id: AC-LEND-006-2
+        then: the request is rejected with error FORBIDDEN
+        when: they ask for another member's loans
+        given: a member
+      - id: AC-LEND-006-3
+        then: the loans are returned
+        when: they ask for a member's loans
+        given: a librarian
+  - id: REQ-LEND-007
+    status: active
+    statement: A librarian shall be able to get a report of all books currently lent out and to whom.
+    acceptanceCriteria:
+      - id: AC-LEND-007-1
+        then: the report of lent books to all users will be returned
+        when: they ask for a complete report of lent books
+        given: a librarian
+      - id: AC-LEND-007-2
+        then: "is refused with the result: FORBIDDEN"
+        when: they ask for a complete report of lent books
+        given: a non-librarian
+schemaVersion: 0.1.0
